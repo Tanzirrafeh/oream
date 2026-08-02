@@ -1,0 +1,84 @@
+PRD
+
+Product: Recurring shared-expense collection — roommates/subscriptions split a fixed USDC amount on a schedule, with per-cycle payment tracking.
+
+Problem: Roommates splitting rent/utilities or groups splitting recurring subscriptions rely on manual Venmo requests each cycle, chase late payers, and have no shared record of who's paid. Oream formalizes the cycle: define the group once, and each cycle members contribute against a visible, auditable tracker.
+
+Users:
+
+Group creator/admin — sets up group, cycle amount, schedule, recipient
+Members — contribute their share each cycle
+Recipient — receives pooled funds once cycle is complete (can be one of the members, e.g. whoever pays the landlord)
+
+Core user flow:
+
+Admin opens /create-group → adds member wallet addresses, sets per-member contribution amount, cycle length (e.g. every 30 days), and recipient address → creates group
+Group dashboard shows current cycle: each member's status (Paid/Unpaid), total collected vs. target, days remaining in cycle
+Each member opens the group link → sees their share owed → approves USDC → clicks "Contribute" → status flips to "Paid"
+Once all members pay (or cycle deadline passes), pooled funds release to recipient — either automatically on last payment, or admin manually triggers release
+New cycle starts automatically (contract tracks cycle number), status resets to "Unpaid" for all members
+History view shows past cycles: who paid, who was late/missed, total collected per cycle
+
+MVP scope (in):
+
+Fixed contribution amount per member (equal split) per cycle
+Manual contribution per cycle (member must actively pay — no auto-pull in v1, since onchain has no native scheduler)
+Release on full collection (or manual admin release)
+Per-cycle status tracking + history
+
+Out of scope (v1):
+
+Unequal splits (v1: equal share only)
+True auto-pull without member action (needs an offchain keeper bot — v2)
+Late fees / penalties
+Adding/removing members mid-cycle
+Multi-token support
+
+Success criteria: Group of 3+ members completes a full cycle — each contributes their share, funds release to recipient, and the cycle history shows an accurate paid/unpaid record.
+
+TRD
+
+Chain: Arc Testnet
+Gas token: USDC (native)
+Payment token: USDC
+
+Contract: Oream.sol
+
+State:
+
+struct Group { address admin; address recipient; address[] members; uint256 amountPerMember; uint256 cycleLength; uint256 currentCycle; uint256 cycleStartTime; }
+mapping(uint256 => Group) groups — groupId → Group
+mapping(uint256 => mapping(uint256 => mapping(address => bool))) paidStatus — groupId → cycle → member → paid?
+mapping(uint256 => mapping(uint256 => uint256)) cycleCollected — groupId → cycle → amount collected so far
+uint256 groupCounter
+
+Functions:
+
+createGroup(address[] members, uint256 amountPerMember, uint256 cycleLength, address recipient) → uint256 groupId
+Stores group, sets cycleStartTime = block.timestamp, currentCycle = 0
+Emits GroupCreated
+contribute(uint256 groupId)
+Checks caller is a member, not already paid this cycle
+Pulls amountPerMember via transferFrom(msg.sender, address(this), amountPerMember)
+Sets paidStatus[groupId][currentCycle][msg.sender] = true
+Adds to cycleCollected
+Emits Contributed(groupId, cycle, member, timestamp)
+If cycleCollected == amountPerMember * members.length → auto-release (transfer full pool to recipient), emit CycleReleased, increment currentCycle, reset cycleStartTime
+manualRelease(uint256 groupId) — admin-only, releases whatever's collected so far if cycle deadline has passed (handles late/missing members), then advances cycle
+getCycleStatus(uint256 groupId, uint256 cycle) view — returns per-member paid status + total collected
+getGroup(uint256 groupId) view
+
+Design decision: no auto-pull scheduler in v1 — cycle release is triggered either by full collection (automatic in contribute) or admin manual release after deadline. True cron-style auto-charging requires an offchain keeper calling the contract, planned as v1.1, not MVP.
+
+Events:
+
+GroupCreated(uint256 groupId, address admin, address recipient, uint256 amountPerMember, uint256 cycleLength)
+Contributed(uint256 groupId, uint256 cycle, address member, uint256 timestamp)
+CycleReleased(uint256 groupId, uint256 cycle, uint256 totalReleased, uint256 timestamp)
+
+Frontend:
+
+Framework: React + App Kit (Viem adapter)
+Pages: /create-group (setup), /group/[groupId] (current cycle status — member list with Paid/Unpaid badges, progress bar, "Contribute" button for connected wallet if it's a member), /group/[groupId]/history (past cycles)
+Real-time updates: listen for Contributed + CycleReleased events, update status badges instantly
+Countdown display: cycleStartTime + cycleLength shown as "X days left in cycle"

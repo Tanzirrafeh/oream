@@ -1,0 +1,23 @@
+1. Admin creates group
+Admin opens /create-group → adds member addresses → sets amount per member + cycle length (e.g. 30 days) + recipient address → calls createGroup(...) → contract stores group, starts cycle 0, emits GroupCreated
+
+2. Group dashboard
+Admin/members open /group/[groupId] → see: member list with Paid/Unpaid badges, total collected vs. target, days remaining in cycle
+
+3. Member contributes
+Connected member sees their status "Unpaid" → checks/approves USDC allowance for Oream contract → clicks "Contribute" → calls contribute(groupId) → contract pulls their share, flips their status to "Paid ✅", emits Contributed
+
+4. Real-time status update
+All open dashboards listening for Contributed event update the member's badge instantly and bump the progress bar
+
+5. Full collection → auto-release
+When the last member contributes and total collected == target → contract auto-transfers pooled USDC to recipient, emits CycleReleased, advances to next cycle, resets all statuses to "Unpaid"
+
+6. Partial collection → manual release
+If cycle deadline passes with some members unpaid, admin opens dashboard → sees "Cycle overdue" → clicks "Release Now" → calls manualRelease(groupId) → sends whatever's collected to recipient, advances cycle, unpaid members carry no penalty in v1 (flagged in history as missed)
+
+7. New cycle begins
+Cycle counter increments, cycleStartTime resets, all member statuses reset to "Unpaid", new countdown starts
+
+8. History view
+/group/[groupId]/history lists every past cycle: who paid, who missed, total collected, release timestamp
