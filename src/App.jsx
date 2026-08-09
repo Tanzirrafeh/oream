@@ -6,6 +6,9 @@ import LandingPage from './pages/LandingPage';
 import CreateGroup from './pages/CreateGroup';
 import GroupDashboard from './pages/GroupDashboard';
 import GroupHistory from './pages/GroupHistory';
+import CircleBridgeModal from './components/CircleBridgeModal';
+import CircleWalletsDrawer from './components/CircleWalletsDrawer';
+import TxLogsModal from './components/TxLogsModal';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 
 function NotificationContainer() {
@@ -37,12 +40,24 @@ function NotificationContainer() {
 }
 
 function MainContent() {
+  const { 
+    bridgeModalOpen, 
+    setBridgeModalOpen, 
+    walletsDrawerOpen, 
+    setWalletsDrawerOpen 
+  } = useOream();
+
   const [activePage, setActivePage] = useState('landing'); // 'landing' | 'create' | 'dashboard' | 'history'
   const [selectedGroupId, setSelectedGroupId] = useState(1);
+  const [txLogsModalOpen, setTxLogsModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#1A1A1A] text-white">
-      <Navbar activePage={activePage} setActivePage={setActivePage} />
+      <Navbar 
+        activePage={activePage} 
+        setActivePage={setActivePage} 
+        onOpenTxLogs={() => setTxLogsModalOpen(true)}
+      />
 
       <main className="flex-grow">
         {activePage === 'landing' && (
@@ -65,6 +80,21 @@ function MainContent() {
 
       <Footer />
       <NotificationContainer />
+
+      {/* Circle & Arc Interactive Modals */}
+      <CircleBridgeModal 
+        isOpen={bridgeModalOpen} 
+        onClose={() => setBridgeModalOpen(false)} 
+        targetGroupId={selectedGroupId}
+      />
+      <CircleWalletsDrawer 
+        isOpen={walletsDrawerOpen} 
+        onClose={() => setWalletsDrawerOpen(false)} 
+      />
+      <TxLogsModal 
+        isOpen={txLogsModalOpen} 
+        onClose={() => setTxLogsModalOpen(false)} 
+      />
     </div>
   );
 }
