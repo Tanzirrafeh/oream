@@ -31,9 +31,9 @@ export default function LandingPage({ setActivePage }) {
         <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center relative z-10">
           {/* Text Content */}
           <div className="space-y-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-[#00D97E]/30 bg-[#00D97E]/10">
-              <span className="w-2 h-2 rounded-full bg-[#00D97E] animate-pulse"></span>
-              <span className="text-xs font-medium text-[#00D97E] tracking-wide uppercase">Arc Testnet Native • USDC Gas</span>
+            <div className="inline-flex items-center gap-3 px-4 py-1.5 rounded-full border border-[#00D97E]/30 bg-[#00D97E]/10">
+              <img src="/oream_logo.png" alt="Oream Official Emblem" className="w-5 h-5 rounded-full object-cover" />
+              <span className="text-xs font-semibold text-[#00D97E] tracking-wide uppercase">Arc Testnet Native • USDC Gas</span>
             </div>
             
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tighter leading-[1.1]">
@@ -61,15 +61,14 @@ export default function LandingPage({ setActivePage }) {
             </div>
           </div>
 
-          {/* Fake UI Mockup (EXACT CHART STRUCTURE PRESERVED) */}
+          {/* Fake UI Mockup */}
           <div className="relative">
             <div className="relative rounded-2xl glass-panel p-6 border border-white/10 shadow-2xl overflow-hidden group hover:-translate-y-2 transition-transform duration-500">
               {/* Dashboard Header */}
               <div className="flex justify-between items-center mb-8 border-b border-white/5 pb-4">
-                <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500/50"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/50"></div>
-                  <div className="w-3 h-3 rounded-full bg-[#00D97E]"></div>
+                <div className="flex items-center gap-2">
+                  <img src="/oream_logo.png" alt="Oream Brand" className="w-6 h-6 rounded-md object-cover" />
+                  <span className="text-xs font-bold text-white tracking-wider">OREAM PROTOCOL</span>
                 </div>
                 <div className="text-xs text-neutral-500 font-mono">dashboard.oream.io</div>
               </div>
@@ -105,7 +104,7 @@ export default function LandingPage({ setActivePage }) {
 
               {/* Floating Badge */}
               <div className="absolute top-20 right-8 px-3 py-1.5 bg-[#1A1A1A]/90 border border-[#00D97E]/30 backdrop-blur-md rounded-lg shadow-lg flex items-center gap-2 animate-bounce">
-                <div className="w-2 h-2 rounded-full bg-[#00D97E]"></div>
+                <img src="/oream_logo.png" alt="Oream Icon" className="w-4 h-4 rounded-full" />
                 <span className="text-xs text-white">USDC Payment Verified ✅</span>
               </div>
             </div>
@@ -248,8 +247,8 @@ export default function LandingPage({ setActivePage }) {
               
               {/* Code */}
               <pre className="text-neutral-300">
-                <span className="text-[#9D00FF]">import</span> &#123; createPublicClient, http &#125; <span class="text-[#9D00FF]">from</span> <span className="text-[#A8D5A8]">'viem'</span>;{"\n"}
-                <span className="text-[#9D00FF]">import</span> &#123; arcTestnet &#125; <span class="text-[#9D00FF]">from</span> <span className="text-[#A8D5A8]">'viem/chains'</span>;{"\n\n"}
+                <span className="text-[#9D00FF]">import</span> &#123; createPublicClient, http &#125; <span className="text-[#9D00FF]">from</span> <span className="text-[#A8D5A8]">'viem'</span>;{"\n"}
+                <span className="text-[#9D00FF]">import</span> &#123; arcTestnet &#125; <span className="text-[#9D00FF]">from</span> <span className="text-[#A8D5A8]">'viem/chains'</span>;{"\n\n"}
                 <span className="text-[#565656]">// 1. Member approves & contributes USDC</span>{"\n"}
                 <span className="text-[#9D00FF]">const</span> txHash = <span className="text-[#9D00FF]">await</span> oreamContract.<span className="text-[#00D9FF]">contribute</span>(&#123;{"\n"}
                 {"  "}groupId: <span className="text-[#F0F0F0]">1</span>,{"\n"}
@@ -281,7 +280,7 @@ export default function LandingPage({ setActivePage }) {
 
             {/* Step 1 */}
             <div className="relative group">
-              <div className="w-24 h-24 mx-auto rounded-full bg-[#1A1A1A] border border-[#00D97E]/30 flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(0,217,126,0.1)] group-hover:scale-110 transition-transform duration-300">
+              <div className="w-24 h-24 mx-auto rounded-full bg-[#1A1A1A] border border-[#00D97E]/30 flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(0,217,126,0.1)] group-hover:scale-110 transition-transform duration-300 overflow-hidden">
                 <span className="text-3xl font-bold text-[#00D97E]">1</span>
               </div>
               <h3 className="text-xl font-semibold mb-2">Admin Creates Group</h3>
@@ -292,7 +291,7 @@ export default function LandingPage({ setActivePage }) {
 
             {/* Step 2 */}
             <div className="relative group">
-              <div className="w-24 h-24 mx-auto rounded-full bg-[#1A1A1A] border border-[#00D97E]/30 flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(0,217,126,0.1)] group-hover:scale-110 transition-transform duration-300">
+              <div className="w-24 h-24 mx-auto rounded-full bg-[#1A1A1A] border border-[#00D97E]/30 flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(0,217,126,0.1)] group-hover:scale-110 transition-transform duration-300 overflow-hidden">
                 <span className="text-3xl font-bold text-[#00D97E]">2</span>
               </div>
               <h3 className="text-xl font-semibold mb-2">Members Contribute Share</h3>
@@ -303,7 +302,7 @@ export default function LandingPage({ setActivePage }) {
 
             {/* Step 3 */}
             <div className="relative group">
-              <div className="w-24 h-24 mx-auto rounded-full bg-[#1A1A1A] border border-[#00D97E]/30 flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(0,217,126,0.1)] group-hover:scale-110 transition-transform duration-300">
+              <div className="w-24 h-24 mx-auto rounded-full bg-[#1A1A1A] border border-[#00D97E]/30 flex items-center justify-center mb-6 shadow-[0_0_20px_rgba(0,217,126,0.1)] group-hover:scale-110 transition-transform duration-300 overflow-hidden">
                 <span className="text-3xl font-bold text-[#00D97E]">3</span>
               </div>
               <h3 className="text-xl font-semibold mb-2">Auto or Manual Release</h3>
@@ -398,6 +397,9 @@ export default function LandingPage({ setActivePage }) {
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-[#00D97E] opacity-10 blur-[120px] rounded-full pointer-events-none"></div>
 
         <div className="max-w-4xl mx-auto px-6 relative z-10">
+          <div className="w-20 h-20 mx-auto mb-6 rounded-2xl overflow-hidden shadow-[0_0_30px_rgba(0,217,126,0.4)] border border-[#00D97E]/50">
+            <img src="/oream_logo.png" alt="Oream Official Logo" className="w-full h-full object-cover" />
+          </div>
           <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-8">
             Ready to streamline your recurring shared expenses?
           </h2>

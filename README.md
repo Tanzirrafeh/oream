@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="public/oream_logo.png" width="140" alt="Oream Official Logo" style="border-radius: 20px;">
+</p>
+
 # Oream 🪐
 ### *Automated Recurring Shared-Expense Vaults on Arc Layer-1*
 
