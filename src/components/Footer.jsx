@@ -8,9 +8,9 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-12 mb-16">
           {/* Brand */}
           <div className="col-span-1">
-            <a href="#" className="flex items-center gap-2 mb-6">
-              <div className="w-6 h-6 rounded bg-[#00D97E] flex items-center justify-center text-[#1A1A1A]">
-                <Layers className="w-4 h-4" />
+            <a href="#" className="flex items-center gap-3 mb-6">
+              <div className="w-8 h-8 rounded-lg overflow-hidden border border-[#00D97E]/40 shadow-[0_0_10px_rgba(0,217,126,0.3)] bg-[#0F0F0F]">
+                <img src="/oream_logo.png" alt="Oream Logo" className="w-full h-full object-cover" />
               </div>
               <span className="text-lg font-bold tracking-tighter text-white">OREAM</span>
             </a>

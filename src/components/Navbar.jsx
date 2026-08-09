@@ -21,10 +21,19 @@ export default function Navbar({ activePage, setActivePage, onOpenTxLogs }) {
         {/* Brand Logo */}
         <button 
           onClick={() => setActivePage('landing')} 
-          className="flex items-center gap-2.5 group text-left focus:outline-none shrink-0"
+          className="flex items-center gap-3 group text-left focus:outline-none shrink-0"
         >
-          <div className="flex text-[#1A1A1A] bg-[#00D97E] w-9 h-9 rounded-xl items-center justify-center shadow-[0_0_15px_rgba(0,217,126,0.4)] group-hover:scale-105 transition-transform">
-            <Layers className="w-5 h-5 text-[#1A1A1A]" />
+          <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-[#00D97E]/40 shadow-[0_0_15px_rgba(0,217,126,0.3)] group-hover:scale-105 group-hover:border-[#00D97E] transition-all bg-[#0F0F0F] flex items-center justify-center">
+            <img 
+              src="/oream_logo.png" 
+              alt="Oream Logo" 
+              className="w-full h-full object-cover" 
+              onError={(e) => {
+                // Fallback if image load fails
+                e.target.style.display = 'none';
+              }}
+            />
+            <Layers className="w-5 h-5 text-[#00D97E] absolute inset-0 m-auto hidden group-hover:block" />
           </div>
           <div>
             <span className="text-xl font-bold tracking-tighter text-white group-hover:text-[#00D97E] transition-colors">
