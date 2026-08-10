@@ -1,151 +1,160 @@
 import React, { useState } from 'react';
-import { Layers, Wallet, ChevronDown, PlusCircle, RefreshCw, Droplet, Cpu, Zap } from 'lucide-react';
+import { Layers, Wallet, ChevronDown, Zap, LogOut, UserCheck, ShieldCheck, Droplet } from 'lucide-react';
 import { useOream } from '../context/OreamContext';
 
-export default function Navbar({ activePage, setActivePage, onOpenTxLogs }) {
+export default function Navbar({ activePage, setActivePage }) {
   const { 
     activeWallet, 
-    setActiveWallet, 
-    mockWallets, 
-    usdcBalance, 
+    isConnected,
+    walletType,
+    disconnectWallet,
     setBridgeModalOpen, 
-    setWalletsDrawerOpen 
+    setWalletsDrawerOpen,
+    setConnectModalOpen
   } = useOream();
 
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 glass-panel border-b border-white/5 bg-[#1A1A1A]/90 backdrop-blur-lg">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between gap-4">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-[#121214]/90 backdrop-blur-md border-b border-white/[0.08]">
+      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between gap-6">
         
         {/* Brand Logo */}
         <button 
           onClick={() => setActivePage('landing')} 
-          className="flex items-center gap-3 group text-left focus:outline-none shrink-0"
+          className="flex items-center gap-3.5 group text-left focus:outline-none shrink-0"
         >
-          <div className="relative w-10 h-10 rounded-xl overflow-hidden border border-[#00D97E]/40 shadow-[0_0_15px_rgba(0,217,126,0.3)] group-hover:scale-105 group-hover:border-[#00D97E] transition-all bg-[#0F0F0F] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#1E2923] to-[#121214] border border-[#00D97E]/30 flex items-center justify-center shadow-sm group-hover:border-[#00D97E] transition-all">
             <img 
               src="/oream_logo.png" 
               alt="Oream Logo" 
-              className="w-full h-full object-cover" 
+              className="w-7 h-7 object-cover rounded-lg" 
               onError={(e) => {
-                // Fallback if image load fails
                 e.target.style.display = 'none';
               }}
             />
-            <Layers className="w-5 h-5 text-[#00D97E] absolute inset-0 m-auto hidden group-hover:block" />
+            <Layers className="w-5 h-5 text-[#00D97E] hidden group-hover:block" />
           </div>
           <div>
-            <span className="text-xl font-bold tracking-tighter text-white group-hover:text-[#00D97E] transition-colors">
+            <span className="text-xl font-bold tracking-tight text-white group-hover:text-[#00D97E] transition-colors">
               OREAM
             </span>
-            <div className="text-[9px] font-mono text-[#00D97E] tracking-widest uppercase">Arc & Circle</div>
           </div>
         </button>
 
         {/* Navigation Menu */}
-        <div className="hidden lg:flex items-center gap-6">
+        <nav className="hidden md:flex items-center gap-8">
           <button 
             onClick={() => setActivePage('landing')} 
-            className={`text-xs uppercase font-semibold tracking-wider transition-colors ${activePage === 'landing' ? 'text-[#00D97E]' : 'text-neutral-400 hover:text-white'}`}
+            className={`text-sm font-medium transition-colors ${
+              activePage === 'landing' ? 'text-[#00D97E] font-semibold' : 'text-neutral-400 hover:text-white'
+            }`}
           >
             Overview
           </button>
           <button 
             onClick={() => setActivePage('dashboard')} 
-            className={`text-xs uppercase font-semibold tracking-wider transition-colors ${activePage === 'dashboard' ? 'text-[#00D97E]' : 'text-neutral-400 hover:text-white'}`}
+            className={`text-sm font-medium transition-colors ${
+              activePage === 'dashboard' ? 'text-[#00D97E] font-semibold' : 'text-neutral-400 hover:text-white'
+            }`}
           >
             Vault Dashboard
           </button>
-          <button 
-            onClick={() => setActivePage('create')} 
-            className={`text-xs uppercase font-semibold tracking-wider transition-colors ${activePage === 'create' ? 'text-[#00D97E]' : 'text-neutral-400 hover:text-white'}`}
-          >
-            Create Group
-          </button>
           <button
             onClick={() => setBridgeModalOpen(true)}
-            className="text-xs uppercase font-semibold tracking-wider text-[#9D00FF] hover:text-white flex items-center gap-1 transition-colors"
+            className="text-sm font-medium text-neutral-300 hover:text-[#9D00FF] flex items-center gap-1.5 transition-colors"
           >
-            <Zap className="w-3.5 h-3.5" />
+            <Zap className="w-4 h-4 text-[#9D00FF]" />
             <span>Circle Bridge</span>
           </button>
-        </div>
+        </nav>
 
-        {/* Action Controls & Wallet Pill */}
+        {/* Right Action Controls */}
         <div className="flex items-center gap-3">
           
-          {/* Arc Network Status Pill */}
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 text-xs text-neutral-300">
+          {/* Network Indicator Pill */}
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08] text-xs text-neutral-300">
             <span className="w-2 h-2 rounded-full bg-[#00D97E] animate-pulse"></span>
-            <span className="font-semibold text-white">Arc Testnet</span>
-            <span className="text-[10px] text-[#00D97E] font-mono">#50401</span>
+            <span className="font-medium text-neutral-200">Arc Testnet</span>
           </div>
 
-          {/* USDC Balance Pill (Clickable -> Opens Circle Drawer & Faucet) */}
-          <button
-            onClick={() => setWalletsDrawerOpen(true)}
-            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#00D97E]/10 border border-[#00D97E]/30 text-xs font-bold text-[#00D97E] hover:bg-[#00D97E]/20 transition-all shadow-[0_0_10px_rgba(0,217,126,0.15)]"
-          >
-            <Droplet className="w-3.5 h-3.5 text-[#00D97E]" />
-            <span>{usdcBalance.toLocaleString()} USDC</span>
-          </button>
-
-          {/* Onchain Tx Logs Inspector */}
-          <button
-            onClick={onOpenTxLogs}
-            className="p-2 rounded-xl bg-white/5 border border-white/10 hover:border-[#00D9FF] text-[#00D9FF] hover:bg-white/10 transition-colors"
-            title="Inspect Arc Testnet Event Emissions"
-          >
-            <Cpu className="w-4 h-4" />
-          </button>
-
-          {/* Active Wallet Dropdown */}
-          <div className="relative">
+          {/* Wallet Button: Connect vs Connected Dropdown */}
+          {!isConnected ? (
             <button
-              onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white/5 border border-white/10 hover:border-[#00D97E]/50 text-xs text-neutral-200 transition-all"
+              onClick={() => setConnectModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#00D97E] text-[#121214] text-xs font-bold hover:bg-[#00b569] transition-all shadow-[0_0_15px_rgba(0,217,126,0.25)]"
             >
-              <Wallet className="w-3.5 h-3.5 text-[#00D97E]" />
-              <span className="font-mono">{activeWallet.name.split(' ')[0]} ({activeWallet.address.slice(0, 4)}...)</span>
-              <ChevronDown className="w-3 h-3 text-neutral-400" />
+              <Wallet className="w-4 h-4" />
+              <span>Connect Wallet</span>
             </button>
+          ) : (
+            <div className="relative">
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white/[0.05] border border-white/[0.1] hover:border-[#00D97E]/50 text-xs text-neutral-200 transition-all"
+              >
+                {walletType === 'circle' ? (
+                  <ShieldCheck className="w-4 h-4 text-[#9D00FF]" />
+                ) : (
+                  <Wallet className="w-4 h-4 text-[#00D97E]" />
+                )}
+                <span className="font-mono font-medium">
+                  {activeWallet.name.split(' ')[0]} ({activeWallet.address.slice(0, 4)}...)
+                </span>
+                <ChevronDown className="w-3.5 h-3.5 text-neutral-400" />
+              </button>
 
-            {dropdownOpen && (
-              <div className="absolute right-0 mt-2 w-64 rounded-xl glass-panel bg-[#1F1F1F] border border-white/10 shadow-2xl py-2 z-50 animate-fade-in">
-                <div className="px-3 py-2 border-b border-white/5 text-[10px] uppercase font-semibold text-neutral-400 tracking-wider flex justify-between">
-                  <span>Switch Test Persona</span>
-                  <span className="text-[#00D97E]">Arc Testnet</span>
-                </div>
-                {mockWallets.map((wallet) => (
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-64 rounded-xl bg-[#1A1A1E] border border-white/10 shadow-2xl py-2 z-50 animate-fade-in text-xs space-y-1">
+                  <div className="px-3.5 py-2 border-b border-white/5 text-[11px] font-semibold text-neutral-400 flex justify-between items-center">
+                    <span>Connected Wallet</span>
+                    <span className="text-[#00D97E] font-mono uppercase text-[10px]">{walletType}</span>
+                  </div>
+
+                  <div className="px-3.5 py-2 text-neutral-300 font-mono text-[11px] truncate">
+                    {activeWallet.address}
+                  </div>
+
                   <button
-                    key={wallet.address}
                     onClick={() => {
-                      setActiveWallet(wallet);
                       setDropdownOpen(false);
+                      setConnectModalOpen(true);
                     }}
-                    className={`w-full text-left px-3 py-2 text-xs flex items-center justify-between hover:bg-white/5 transition-colors ${
-                      wallet.address === activeWallet.address ? 'text-[#00D97E] font-medium bg-white/5' : 'text-neutral-300'
-                    }`}
+                    className="w-full text-left px-3.5 py-2 text-neutral-200 hover:bg-white/5 flex items-center gap-2 transition-colors"
                   >
-                    <span>{wallet.name}</span>
-                    <span className="font-mono text-[10px] text-neutral-500">{wallet.address.slice(0, 6)}...</span>
+                    <UserCheck className="w-3.5 h-3.5 text-[#00D97E]" />
+                    <span>Switch Wallet / Demo Account</span>
                   </button>
-                ))}
-              </div>
-            )}
-          </div>
 
-          {/* Create Group Button */}
-          <button
-            onClick={() => setActivePage('create')}
-            className="px-4 py-2.5 rounded-xl bg-[#00D97E] text-[#1A1A1A] text-xs font-bold hover:bg-[#00b569] transition-all neon-glow flex items-center gap-1.5"
-          >
-            <PlusCircle className="w-4 h-4" />
-            <span className="hidden sm:inline">Create Group</span>
-          </button>
+                  <button
+                    onClick={() => {
+                      setDropdownOpen(false);
+                      setWalletsDrawerOpen(true);
+                    }}
+                    className="w-full text-left px-3.5 py-2 text-neutral-200 hover:bg-white/5 flex items-center gap-2 transition-colors"
+                  >
+                    <Droplet className="w-3.5 h-3.5 text-[#00D9FF]" />
+                    <span>Circle Developer Platform</span>
+                  </button>
+
+                  <div className="border-t border-white/5 pt-1">
+                    <button
+                      onClick={() => {
+                        disconnectWallet();
+                        setDropdownOpen(false);
+                      }}
+                      className="w-full text-left px-3.5 py-2 text-red-400 hover:bg-red-500/10 flex items-center gap-2 transition-colors font-medium"
+                    >
+                      <LogOut className="w-3.5 h-3.5" />
+                      <span>Disconnect Wallet</span>
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
-    </nav>
+    </header>
   );
 }

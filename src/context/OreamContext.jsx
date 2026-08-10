@@ -50,6 +50,9 @@ const INITIAL_GROUPS = [
 export const OreamProvider = ({ children }) => {
   const [groups, setGroups] = useState(INITIAL_GROUPS);
   const [activeWallet, setActiveWallet] = useState(MOCK_WALLETS[0]);
+  const [isConnected, setIsConnected] = useState(false); // User connects wallet in dashboard/navbar
+  const [walletType, setWalletType] = useState('demo'); // 'demo' | 'circle' | 'metamask'
+  const [connectModalOpen, setConnectModalOpen] = useState(false);
   const [usdcBalance, setUsdcBalance] = useState(3500); // 3,500 USDC testnet balance
   const [allowances, setAllowances] = useState({
     1: 10000
@@ -61,6 +64,18 @@ export const OreamProvider = ({ children }) => {
   const [bridgeModalOpen, setBridgeModalOpen] = useState(false);
   const [walletsDrawerOpen, setWalletsDrawerOpen] = useState(false);
   const [web3Mode, setWeb3Mode] = useState('simulated'); // 'simulated' | 'arcTestnet'
+
+  const connectWallet = (wallet, type = 'demo') => {
+    setActiveWallet(wallet);
+    setIsConnected(true);
+    setWalletType(type);
+    addNotification(`Connected to ${wallet.name} (${wallet.address.slice(0, 6)}...)`);
+  };
+
+  const disconnectWallet = () => {
+    setIsConnected(false);
+    addNotification('Wallet disconnected.');
+  };
 
   const addNotification = (message, type = "success") => {
     const id = Date.now();
@@ -268,6 +283,13 @@ export const OreamProvider = ({ children }) => {
         groups,
         activeWallet,
         setActiveWallet,
+        isConnected,
+        setIsConnected,
+        walletType,
+        connectWallet,
+        disconnectWallet,
+        connectModalOpen,
+        setConnectModalOpen,
         mockWallets: MOCK_WALLETS,
         usdcBalance,
         setUsdcBalance,

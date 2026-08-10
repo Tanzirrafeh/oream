@@ -8,7 +8,7 @@ import GroupDashboard from './pages/GroupDashboard';
 import GroupHistory from './pages/GroupHistory';
 import CircleBridgeModal from './components/CircleBridgeModal';
 import CircleWalletsDrawer from './components/CircleWalletsDrawer';
-import TxLogsModal from './components/TxLogsModal';
+import ConnectWalletModal from './components/ConnectWalletModal';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 
 function NotificationContainer() {
@@ -44,19 +44,19 @@ function MainContent() {
     bridgeModalOpen, 
     setBridgeModalOpen, 
     walletsDrawerOpen, 
-    setWalletsDrawerOpen 
+    setWalletsDrawerOpen,
+    connectModalOpen,
+    setConnectModalOpen
   } = useOream();
 
   const [activePage, setActivePage] = useState('landing'); // 'landing' | 'create' | 'dashboard' | 'history'
   const [selectedGroupId, setSelectedGroupId] = useState(1);
-  const [txLogsModalOpen, setTxLogsModalOpen] = useState(false);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#1A1A1A] text-white">
       <Navbar 
         activePage={activePage} 
         setActivePage={setActivePage} 
-        onOpenTxLogs={() => setTxLogsModalOpen(true)}
       />
 
       <main className="flex-grow">
@@ -91,9 +91,9 @@ function MainContent() {
         isOpen={walletsDrawerOpen} 
         onClose={() => setWalletsDrawerOpen(false)} 
       />
-      <TxLogsModal 
-        isOpen={txLogsModalOpen} 
-        onClose={() => setTxLogsModalOpen(false)} 
+      <ConnectWalletModal
+        isOpen={connectModalOpen}
+        onClose={() => setConnectModalOpen(false)}
       />
     </div>
   );

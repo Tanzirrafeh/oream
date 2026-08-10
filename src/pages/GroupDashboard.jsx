@@ -14,7 +14,9 @@ import {
   RefreshCw,
   Droplet,
   Layers,
-  ExternalLink
+  ExternalLink,
+  ShieldCheck,
+  UserCheck
 } from 'lucide-react';
 import { useOream } from '../context/OreamContext';
 
@@ -23,6 +25,10 @@ export default function GroupDashboard({ groupId, setActivePage, setSelectedGrou
     groups, 
     activeWallet, 
     setActiveWallet, 
+    isConnected,
+    connectWallet,
+    setConnectModalOpen,
+    walletType,
     mockWallets, 
     allowances, 
     approveUsdc, 
@@ -66,9 +72,9 @@ export default function GroupDashboard({ groupId, setActivePage, setSelectedGrou
   const isOverdue = remainingMs <= 0;
 
   // Connected wallet status
-  const isConnectedMember = group.members.some((m) => m.address.toLowerCase() === activeWallet.address.toLowerCase());
-  const hasPaidCurrentCycle = !!currentCyclePaid[activeWallet.address];
-  const isAdmin = activeWallet.address.toLowerCase() === group.admin.toLowerCase();
+  const isConnectedMember = isConnected && group.members.some((m) => m.address.toLowerCase() === activeWallet.address.toLowerCase());
+  const hasPaidCurrentCycle = isConnected && !!currentCyclePaid[activeWallet.address];
+  const isAdmin = isConnected && activeWallet.address.toLowerCase() === group.admin.toLowerCase();
   const currentAllowance = allowances[group.groupId] || 0;
   const isAllowanceApproved = currentAllowance >= amountPerMember;
 
@@ -106,7 +112,7 @@ export default function GroupDashboard({ groupId, setActivePage, setSelectedGrou
                 Group #{group.groupId}
               </span>
               <span className="text-xs text-neutral-400 font-mono flex items-center gap-1">
-                Arc Testnet Contract:
+                Arc Contract:
                 <a href="https://testnet.arcscan.app" target="_blank" rel="noreferrer" className="text-[#00D9FF] hover:underline flex items-center gap-0.5">
                   0x8888...8888 <ExternalLink className="w-3 h-3" />
                 </a>
@@ -150,41 +156,78 @@ export default function GroupDashboard({ groupId, setActivePage, setSelectedGrou
           </div>
         </div>
 
-        {/* Demo Wallet Switcher & Circle Faucet Banner */}
-        <div className="p-4 rounded-xl bg-[#1F1F1F] border border-white/10 flex flex-col lg:flex-row items-center justify-between gap-4">
-          <div className="flex flex-wrap items-center gap-3 text-xs text-neutral-300">
-            <Wallet className="w-4 h-4 text-[#00D97E]" />
-            <span>Active Persona: <strong>{activeWallet.name}</strong> ({activeWallet.address.slice(0, 6)}...{activeWallet.address.slice(-4)})</span>
-            {isAdmin && <span className="px-2 py-0.5 rounded text-[10px] bg-[#9D00FF]/20 text-[#9D00FF] font-semibold border border-[#9D00FF]/40">ADMIN</span>}
-            <span className="text-neutral-500">|</span>
-            <span className="text-[#00D97E] font-bold">Balance: {usdcBalance.toLocaleString()} USDC</span>
-          </div>
+        {/* WALLET CONNECTION REQUIRED BANNER (If Disconnected) */}
+        {!isConnected ? (
+          <div className="p-8 rounded-2xl glass-panel border border-[#00D97E]/30 bg-[#161618]/90 text-center space-y-6 shadow-2xl">
+            <div className="w-16 h-16 rounded-full bg-[#00D97E]/15 border border-[#00D97E]/40 mx-auto flex items-center justify-center text-[#00D97E]">
+              <Wallet className="w-8 h-8" />
+            </div>
+            
+            <div className="space-y-2 max-w-lg mx-auto">
+              <h2 className="text-2xl font-bold text-white tracking-tight">Connect Wallet to Participate</h2>
+              <p className="text-sm text-neutral-400 leading-relaxed">
+                Connect your Web3 Wallet or Circle Developer Wallet to view live member contributions, approve USDC allowance, and pay your cycle share on Arc Testnet.
+              </p>
+            </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setWalletsDrawerOpen(true)}
-              className="px-3 py-1 rounded-lg bg-[#00D97E]/10 border border-[#00D97E]/30 text-[#00D97E] text-xs font-semibold hover:bg-[#00D97E]/20 flex items-center gap-1 transition-all mr-2"
-            >
-              <Droplet className="w-3.5 h-3.5" />
-              <span>Get Faucet USDC</span>
-            </button>
-
-            <span className="text-[11px] text-neutral-400">Switch:</span>
-            {mockWallets.map((w) => (
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
               <button
-                key={w.address}
-                onClick={() => setActiveWallet(w)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
-                  w.address === activeWallet.address
-                    ? 'bg-[#00D97E] text-[#1A1A1A] font-bold shadow-[0_0_10px_rgba(0,217,126,0.3)]'
-                    : 'bg-white/5 text-neutral-300 hover:bg-white/10'
-                }`}
+                onClick={() => setConnectModalOpen(true)}
+                className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-[#00D97E] text-[#121214] text-sm font-bold hover:bg-[#00b569] transition-all flex items-center justify-center gap-2 neon-glow"
               >
-                {w.name.split(' ')[0]}
+                <Wallet className="w-4 h-4" />
+                <span>Connect Wallet Now</span>
               </button>
-            ))}
+              
+              <button
+                onClick={() => connectWallet(mockWallets[0], 'demo')}
+                className="w-full sm:w-auto px-6 py-3.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white text-sm font-medium transition-all"
+              >
+                <span>Quick Demo (Alex Admin)</span>
+              </button>
+            </div>
           </div>
-        </div>
+        ) : (
+          /* Active Wallet Banner & Circle Faucet Controls */
+          <div className="p-4 rounded-xl bg-[#1F1F1F] border border-white/10 flex flex-col lg:flex-row items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-3 text-xs text-neutral-300">
+              {walletType === 'circle' ? (
+                <ShieldCheck className="w-4 h-4 text-[#9D00FF]" />
+              ) : (
+                <Wallet className="w-4 h-4 text-[#00D97E]" />
+              )}
+              <span>Active Persona: <strong>{activeWallet.name}</strong> ({activeWallet.address.slice(0, 6)}...{activeWallet.address.slice(-4)})</span>
+              {isAdmin && <span className="px-2 py-0.5 rounded text-[10px] bg-[#9D00FF]/20 text-[#9D00FF] font-semibold border border-[#9D00FF]/40">ADMIN</span>}
+              <span className="text-neutral-500">|</span>
+              <span className="text-[#00D97E] font-bold">Balance: {usdcBalance.toLocaleString()} USDC</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setWalletsDrawerOpen(true)}
+                className="px-3 py-1 rounded-lg bg-[#00D97E]/10 border border-[#00D97E]/30 text-[#00D97E] text-xs font-semibold hover:bg-[#00D97E]/20 flex items-center gap-1 transition-all mr-2"
+              >
+                <Droplet className="w-3.5 h-3.5" />
+                <span>Get Faucet USDC</span>
+              </button>
+
+              <span className="text-[11px] text-neutral-400">Switch Demo:</span>
+              {mockWallets.map((w) => (
+                <button
+                  key={w.address}
+                  onClick={() => connectWallet(w, 'demo')}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-medium transition-all ${
+                    w.address === activeWallet.address
+                      ? 'bg-[#00D97E] text-[#1A1A1A] font-bold shadow-[0_0_10px_rgba(0,217,126,0.3)]'
+                      : 'bg-white/5 text-neutral-300 hover:bg-white/10'
+                  }`}
+                >
+                  {w.name.split(' ')[0]}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Cycle Overview Grid */}
         <div className="grid md:grid-cols-3 gap-6">
@@ -287,7 +330,7 @@ export default function GroupDashboard({ groupId, setActivePage, setSelectedGrou
               <tbody className="divide-y divide-white/5 text-sm">
                 {group.members.map((member, idx) => {
                   const isPaid = !!currentCyclePaid[member.address];
-                  const isUserActive = member.address.toLowerCase() === activeWallet.address.toLowerCase();
+                  const isUserActive = isConnected && member.address.toLowerCase() === activeWallet.address.toLowerCase();
 
                   return (
                     <tr key={idx} className={`hover:bg-white/5 transition-colors ${isUserActive ? 'bg-[#00D97E]/5' : ''}`}>
@@ -335,7 +378,17 @@ export default function GroupDashboard({ groupId, setActivePage, setSelectedGrou
               Member Action Panel (Arc Native USDC Gas)
             </h3>
 
-            {!isConnectedMember ? (
+            {!isConnected ? (
+              <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center space-y-3">
+                <p className="text-xs text-neutral-400">Please connect your wallet to execute USDC approvals and contributions.</p>
+                <button
+                  onClick={() => setConnectModalOpen(true)}
+                  className="px-4 py-2 rounded-lg bg-[#00D97E] text-[#121214] text-xs font-bold"
+                >
+                  Connect Wallet
+                </button>
+              </div>
+            ) : !isConnectedMember ? (
               <p className="text-xs text-neutral-400">
                 The currently connected persona (<code>{activeWallet.name}</code>) is not a member of this group. Switch wallet persona above to test contribution.
               </p>
@@ -401,7 +454,9 @@ export default function GroupDashboard({ groupId, setActivePage, setSelectedGrou
               Admin Controls
             </h3>
 
-            {!isAdmin ? (
+            {!isConnected ? (
+              <p className="text-xs text-neutral-400">Connect wallet as Admin to trigger manual releases.</p>
+            ) : !isAdmin ? (
               <p className="text-xs text-neutral-400">
                 Only the group admin (<code>{group.admin.slice(0, 6)}...</code>) can execute manual pool releases if the cycle deadline passes. Switch to Alex (Admin) to view controls.
               </p>
