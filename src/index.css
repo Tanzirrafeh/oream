@@ -4,7 +4,7 @@
 
 @layer base {
   html {
-    font-size: 140%; /* Increases scale of all font sizes and rem-based dimensions by 40% */
+    font-size: 115%; /* Decreased overall scale by 20% for comfortable layout & font sizes */
   }
 }
 
